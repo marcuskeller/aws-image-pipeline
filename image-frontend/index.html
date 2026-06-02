@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rendimensionador de Imagem</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Rendimensionador</h1>
+            <p>
+                Envie uma imagem e insira o seu e-mail para redimensionar a sua imagem. Após isso, verifique a sua caixa
+                de spam do e-mail.
+            </p>
+        </div>
+
+        <form onsubmit="event.preventDefault(); return false;">
+            <label class="email-label">
+                Email
+                <input type="email" id="email" name="email" placeholder="Digite o seu email">
+            </label>
+
+            <label for="file" class="drop-zone">
+                <div class="content">
+                    <span><i class="icon fa-solid fa-cloud-arrow-up"></i> </span>
+                    <h3>Upload de Arquivos</h3>
+                    <p>Arraste ou clique para selecionar</p>
+                    <span id="file-name"></span>
+                </div>
+                <input type="file" accept="image/*" id="file" name="file">
+            </label>
+
+
+            <button type="button" onclick="upload()">
+                Enviar Foto
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </form>
+        
+        <footer>
+            <p>&copy; 2026 Marcus Keller. Todos os direitos reservados.</p>
+        </footer>
+    </div>
+</body>
+<script src="script.js"></script>
+</html>
