@@ -1,73 +1,81 @@
-## Configurando o Lambda
+# AWS Image Pipeline 🚀
 
-Neste processo o Lambda é essencial, pois ele irá gerar uma URL assinada com o email do remetente e devolverá para a aplicação web,
-a aplicação então irá salvar esta imagem diretamente no seu S3(Serviço de Bucket) este serviço irá emitir um evento para 
-o SQS(Serviço de filas) fazendo assim o pedido ser salvo na fila.
+Um pipeline de processamento de imagens automatizado e escalável, utilizando uma arquitetura baseada em eventos na AWS. O sistema permite que usuários façam upload de imagens de forma segura, processem essas imagens de forma assíncrona e recebam uma notificação por e-mail quando o trabalho estiver concluído.
 
-[image-producer-lambda](https://github.com/marcuskeller/image-producer-lambda)
+## 🏗️ Arquitetura do Sistema
 
-## Image Consumer EC2 
+O fluxo de dados do projeto segue estas etapas:
 
-O EC2 vai ler a fila do SQS e ver qual é a próxima imagem a ser processada, com isso irá pegar esta imagem, redimensionar o tamanho e vai marcar esta imagem como 
-processada no S3 e irá enviar um email para o remetente com a imagem redimensionada.
+1.  **Frontend (Web):** O usuário insere seu e-mail e seleciona uma imagem.
+2.  **AWS Lambda (Producer):** O frontend solicita uma URL pré-assinada à Lambda para fazer o upload seguro diretamente para o S3 (evitando sobrecarga do servidor).
+3.  **Amazon S3 (Entrada):** A imagem original é salva no bucket e dispara um **Evento de Notificação**.
+4.  **Amazon SQS (Fila):** O evento do S3 é enfileirado no SQS para garantir resiliência e desacoplamento.
+5.  **Amazon EC2 (Consumer):** Um Worker Java em execução na EC2 faz *Long Polling* na fila, baixa a imagem, redimensiona-a e salva a versão processada no bucket de saída.
+6.  **Amazon SES (Notificação):** O Consumer gera um link temporário da imagem pronta e envia um e-mail automático ao usuário.
 
+---
 
-## Configurando a AWS CLI no seu ambiente local
+## 🛠️ Tecnologias Utilizadas
 
-Para acessar a sua instância pelo seu prompt precisamos configurar o setup do seu ambiente local. Dito isso abaixo deixo 
-um guia explicando o passo a passo.
+*   **Frontend:** HTML5, CSS3 (Modern UI), JavaScript (Vanilla), Mermaid.js (Fluxogramas).
+*   **Backend (Lambda & EC2):** Java 21, Gradle, AWS SDK v2.
+*   **Serviços AWS:** S3, SQS, Lambda, EC2, SES, IAM.
 
+---
 
-### Instale o AWS CLI na sua máquina
-Para que este processo de certo, primeiro você precisa instalar o AWS CLI na sua máquina local:
+## 🚀 Como Iniciar o Projeto
 
-[AWS CLI DOWNLOAD- OFICIAL](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+### 1. Configuração da Infraestrutura AWS
+Certifique-se de ter o AWS CLI instalado e configurado em sua máquina local.
 
-Para verificar se a instalação funcionou insira esse comando:
-```
+```bash
+# Verificar instalação
 aws --version
-```
 
-Se aparecer algo como `aws-cli/2.x.x` , a instalação foi um sucesso.
-
-## Configuração de Credenciais
-### Obtenhas as chaves:
-
-Vá ao console da AWS, clique no seu nome de usuário (topo direito) -> **Security Credentials**.
-
-Vá em **Access Keys** e crie uma nova. Copie o **Access Key ID** e o **Secret Access Key**.
-
-### Execute o comando de configuração:
-No seu terminal, digite:
-```
+# Configurar credenciais (Use uma região como sa-east-1)
 aws configure
 ```
 
-### Insira os dados
+### 2. Lambda Producer (`image-producer-lambda`)
+Este módulo é responsável por autorizar o upload.
+*   **Build:** Execute `./gradlew shadowJar` para gerar o arquivo `.jar`.
+*   **Deploy:** Faça o upload do `.jar` para uma função Lambda com permissões de escrita no S3.
+*   **Configuração:** Defina a variável de ambiente `S3_BUCKET_NAME` com o nome do seu bucket de entrada.
 
-```
-AWS ID de chave de acesso: Cole o ID que você copiou.
+### 3. Frontend Web (`image-frontend`)
+Interface amigável para o usuário.
+*   **Configuração:** No arquivo `script.js`, atualize a URL do `fetch` para apontar para a **Function URL** da sua Lambda.
+*   **Uso:** Basta abrir o `index.html` em qualquer navegador.
 
-AWS chave secreta de acesso: Cole a chave secreta.
+### 4. EC2 Consumer (`image-consumer-ec2`)
+O "motor" de processamento que roda 24/7 ou sob demanda.
+*   **Build:** Execute `./gradlew build` para gerar o `.jar` executável.
+*   **Transferência:** Envie o arquivo para sua instância Linux:
+    ```bash
+    scp -i "sua-chave.pem" build/libs/seu-app.jar ec2-user@IP_DA_EC2:/home/ec2-user/
+    ```
+*   **Execução:**
+    ```bash
+    java -jar seu-app.jar
+    ```
+    *Certifique-se de que a instância EC2 tenha uma IAM Role com permissões para SQS, S3 e SES.*
 
-Nome da região padrão: sa-east-1 (ou a região onde seu bucket/fila estão).
+---
 
-Formato de saida padrão: json (recomendado).
-```
+## 📂 Estrutura de Arquivos
 
-### Teste
-Para garantir que está tudo funcionando, tente listar os seus buckets S3:
-```
-aws s3 ls
-```
+*   `/image-frontend`: Contém a interface web e a lógica de comunicação com a Lambda.
+*   `/image-producer-lambda`: Código Java da função Serverless que gera as URLs de upload.
+*   `/image-consumer-ec2`: Aplicação Java Worker que processa as mensagens da fila e as imagens.
 
-### Iniciando EC2
-Para iniciar a sua instância da AWS abra o seu cmd e insira o seguinte comando:
-```
-ssh -i "...\key-pair.pem" ec2-user@seu_IP_publico_ec2
-```
+---
 
-### Inserindo arquivo .Jar no seu EC2
-```
-scp -i "...\key-pair.pem" ...\seu-app.jar ec2-user@54.xx.xx.xx:/home/ec2-user/
-```
+## 🛡️ Segurança e Boas Práticas
+*   **URLs Pré-assinadas:** Garantem que o bucket S3 não precise ser público para receber uploads.
+*   **IAM Roles:** O projeto utiliza o princípio de menor privilégio para acesso aos recursos.
+*   **Variáveis de Ambiente:** Nenhuma chave de acesso (Secret Key) está hardcoded no código; o sistema utiliza o provedor de credenciais padrão da AWS.
+
+---
+
+## ✒️ Autor
+Desenvolvido por **Marcus Keller**.
