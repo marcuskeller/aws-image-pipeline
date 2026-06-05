@@ -1,0 +1,43 @@
+### OS ###
+.DS_Store
+Thumbs.db
+*.tmp
+
+### IDEs ###
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+out/
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### Gradle ###
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+### Environment ###
+.env
+.env.*
+!.env.example
+
+### Java / Build ###
+bin/
+gen/
+*.class
+*.war
+*.ear
+
+### Other ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
