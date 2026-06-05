@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Entenda a arquitetura serverless utilizada para o redimensionamento de imagens na AWS.">
+    <title>Arquitetura do Projeto - AWS Image Pipeline</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%2210%22 y=%2210%22 width=%2250%22 height=%2250%22 rx=%228%22 fill=%22%232563EB%22/><rect x=%2235%22 y=%2235%22 width=%2255%22 height=%2255%22 rx=%228%22 fill=%22none%22 stroke=%22%232563EB%22 stroke-width=%228%22 stroke-dasharray=%2210%22/><path d=%22M75 75 L90 90 M90 75 L90 90 L75 90%22 stroke=%22%232563EB%22 stroke-width=%2210%22 fill=%22none%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/></svg>">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script type="module" src="script.js"></script>
+</head>
+<body>
+    <main class="architecture-container">
+        <div class="container-inner">
+            <div style="width: 100%; text-align: left;">
+                <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Voltar para o Upload</a>
+            </div>
+            
+            <header>
+                <h1>Arquitetura do Sistema</h1>
+                <p>Conheça os serviços AWS que fazem essa mágica acontecer.</p>
+            </header>
+
+            <div class="services-grid">
+                <div class="service-card">
+                    <span class="service-icon"><i class="fa-solid fa-bolt" style="color: #ff9900;"></i></span>
+                    <h2>AWS Lambda</h2>
+                    <span class="service-role">Serverless Functions | Producer</span>
+                    <p>Gera URLs pré-assinadas para que o navegador faça upload seguro diretamente para o S3.</p>
+                </div>
+
+                <div class="service-card">
+                    <span class="service-icon">🪣</span>
+                    <h2>Amazon S3</h2>
+                    <span class="service-role">Simple Storage Service | Storage & Hosting</span>
+                    <p>Armazena as imagens originais e processadas, hospeda o frontend estático e dispara eventos para o SQS ao receber novos arquivos.</p>
+                </div>
+
+                <div class="service-card">
+                    <span class="service-icon">✉️</span>
+                    <h2>Amazon SQS</h2>
+                    <span class="service-role">Simple Queue Service | Messaging Queue</span>
+                    <p>Recebe notificações de novos arquivos do S3 e os mantém em fila para o processamento.</p>
+                </div>
+
+                <div class="service-card">
+                    <span class="service-icon">☁️</span>
+                    <h2>Amazon EC2</h2>
+                    <span class="service-role">Elastic Compute Cloud | Consumer (Worker)</span>
+                    <p>Instância Linux que processa as imagens, redimensionando-as e aplicando as regras de negócio.</p>
+                </div>
+
+                <div class="service-card">
+                    <span class="service-icon">📧</span>
+                    <h2>Amazon SES</h2>
+                    <span class="service-role">Simple Email Service | Notification</span>
+                    <p>Envia um e-mail automático para o usuário com o link da imagem pronta para download.</p>
+                </div>
+            </div>
+
+            <section class="flowchart-section">
+                <h2>Fluxograma do Processo</h2>
+                <div class="mermaid">
+                    graph TD
+                        A[Usuário] -->|1. Pede URL| B(Lambda)
+                        B -->|2. Retorna URL| A
+                        A -->|3. Upload Imagem| C[S3 Bucket Entrada]
+                        C -->|4. Evento Notificação| D[SQS Queue]
+                        D -->|5. Long Polling| E[EC2 Consumer]
+                        E -->|6. Processa Imagem| E
+                        E -->|7. Salva Processada| F[S3 Bucket Saída]
+                        E -->|8. Envia E-mail| G[Amazon SES]
+                        G -->|9. Notificação Link| A
+                </div>
+            </section>
+        </div>
+
+        <footer>
+            <p>&copy; 2026 Marcus Keller. Todos os direitos reservados.</p>
+        </footer>
+    </main>
+</body>
+</html>

@@ -4,25 +4,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Redimensione suas imagens de forma rápida e segura com processamento em nuvem AWS.">
     <title>Rendimensionador de Imagem</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%2210%22 y=%2210%22 width=%2250%22 height=%2250%22 rx=%228%22 fill=%22%232563EB%22/><rect x=%2235%22 y=%2235%22 width=%2255%22 height=%2255%22 rx=%228%22 fill=%22none%22 stroke=%22%232563EB%22 stroke-width=%228%22 stroke-dasharray=%2210%22/><path d=%22M75 75 L90 90 M90 75 L90 90 L75 90%22 stroke=%22%232563EB%22 stroke-width=%2210%22 fill=%22none%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/></svg>">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
 
 <body>
-    <div class="container">
-        <div class="header">
+    <main class="home-container">
+        <header>
             <h1>Redimensionador</h1>
             <p>
                 Envie uma imagem e insira o seu e-mail para redimensionar a sua imagem. Após isso, verifique a sua caixa
                 de spam do e-mail.
             </p>
-        </div>
+        </header>
 
         <form onsubmit="event.preventDefault(); return false;">
             <label class="email-label">
                 Email
-                <input type="email" id="email" name="email" placeholder="Digite o seu email">
+                <input type="email" id="email" name="email" placeholder="Digite o seu email" required>
             </label>
 
             <label for="file" class="drop-zone">
@@ -32,7 +34,7 @@
                     <p>Arraste ou clique para selecionar</p>
                     <span id="file-name"></span>
                 </div>
-                <input type="file" accept="image/*" id="file" name="file">
+                <input type="file" accept="image/*" id="file" name="file" required>
             </label>
 
 
@@ -42,14 +44,14 @@
             </button>
 
             <div class="aws-link-container">
-                <a href="#">Fluxograma do uso da AWS no projeto <i class="icon fa-solid fa-arrow-right"></i></a>
+                <a href="architecture.html">Fluxograma do uso da AWS no projeto <i class="icon fa-solid fa-arrow-right"></i></a>
             </div>
         </form>
         
         <footer>
             <p>&copy; 2026 Marcus Keller. Todos os direitos reservados.</p>
         </footer>
-    </div>
+    </main>
 </body>
 <script src="script.js"></script>
 </html>
