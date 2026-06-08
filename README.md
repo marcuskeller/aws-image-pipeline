@@ -1,5 +1,7 @@
 # AWS Image Pipeline 🚀
 
+**🔗 Acesse o projeto:** [https://d3ponzozxkaqi3.cloudfront.net/](https://d3ponzozxkaqi3.cloudfront.net/)
+
 Um pipeline de processamento de imagens automatizado e escalável, utilizando uma arquitetura baseada em eventos na AWS. O sistema permite que usuários façam upload de imagens de forma segura, processem essas imagens de forma assíncrona e recebam uma notificação por e-mail quando o trabalho estiver concluído.
 
 ## 🏗️ Arquitetura do Sistema
